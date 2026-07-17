@@ -1,7 +1,28 @@
 {
-  "name": "agent-template",
-  "private": true,
+  "name": "@raiz32/agent-template",
+  "version": "1.0.0",
+  "description": "CLI for installing AI coding-agent instructions and workflows into Node.js projects.",
+  "keywords": [
+    "ai",
+    "agent",
+    "cli",
+    "coding-agent",
+    "template",
+    "workflow"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raiz32/agent-template.git"
+  },
+  "homepage": "https://github.com/raiz32/agent-template#readme",
+  "bugs": {
+    "url": "https://github.com/raiz32/agent-template/issues"
+  },
+  "license": "MIT",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "bin": {
     "myagent": "dist/cli.js"
   },
@@ -10,12 +31,15 @@
     "AGENTS.md",
     "CLAUDE.md",
     "ai-doc",
-    "scripts"
+    "scripts/build-check.mjs"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "dev": "tsx src/cli.ts",
     "build": "tsc",
-    "prepare": "npm run build",
+    "prepack": "npm run build",
     "start": "node dist/cli.js"
   },
   "devDependencies": {

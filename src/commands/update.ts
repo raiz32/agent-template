@@ -57,7 +57,7 @@ async function ensureInstalled(targetRootPath: string): Promise<void> {
 
     if (!agentsMdExists) {
         throw new Error(
-            `AGENTS.md not found in target project. Run install first: agent-template install ${targetRootPath}`,
+            `AGENTS.md not found in target project. Run install first: myagent install ${targetRootPath}`,
         );
     }
 }

@@ -1,6 +1,6 @@
 # Agent Template
 
-CLI สำหรับติดตั้งชุดเอกสารและ workflow ของ AI coding agent ลงใน project ของคุณ
+CLI สำหรับติดตั้งชุดเอกสารและ workflow ของ AI coding agent ลงใน Node.js project โดยรองรับ JavaScript และ TypeScript frontend project เช่น Vue, React, Nuxt, Next และ Vite
 
 หลังติดตั้งแบบปกติ คุณจะได้รับ:
 
@@ -9,49 +9,66 @@ CLI สำหรับติดตั้งชุดเอกสารและ 
 - `scripts/build-check.mjs`
 - script `build:check` ใน `package.json`
 
-## Requirements
+## Installation
 
-- Node.js (พร้อม npm/npx)
-- Git สำหรับดาวน์โหลด package จาก GitHub
+ต้องใช้ Node.js 20 หรือใหม่กว่า และ target project สำหรับการติดตั้งแบบปกติต้องมี `package.json`
 
-## ติดตั้งลง Node.js project
-
-target project ต้องมี `package.json` และควรมี script `build`
+ติดตั้งลง project ปัจจุบัน:
 
 ```bash
-npx --yes --allow-git=all github:raiz32/agent-template install ../my-project
+npx @raiz32/agent-template install .
 ```
 
-คำสั่งนี้จะ copy template ทั้งหมด รวม `scripts/build-check.mjs` และเพิ่ม `build:check` หากยังไม่มี
-
-## อัปเดต template
-
-ใช้กับ project ที่เคยติดตั้งแล้ว:
+หรือใช้ pnpm:
 
 ```bash
-npx --yes --allow-git=all github:raiz32/agent-template update ../my-project
+pnpm dlx @raiz32/agent-template install .
 ```
 
-`update` จะ backup `AGENTS.md` เป็น `AGENTS.md.bak` และ `CLAUDE.md` เป็น `CLAUDE.md.bak` ก่อน update (หากมีไฟล์อยู่) และไม่ทับ `ai-doc/preferences/` หรือ `ai-doc/project/`
+## Usage
 
-## ติดตั้งเฉพาะเอกสาร
-
-หาก target เป็น folder ทั่วไปที่ไม่มี `package.json` ให้ใช้ `--template-only`:
+ระบุ target path ได้โดยตรง:
 
 ```bash
-npx --yes --allow-git=all github:raiz32/agent-template install ../my-folder --template-only
+npx @raiz32/agent-template install ../my-project
+npx @raiz32/agent-template update ../my-project
 ```
 
-mode นี้ copy เฉพาะ `AGENTS.md`, `CLAUDE.md` และ `ai-doc/` โดยไม่ copy `scripts/` และไม่แก้ไข `package.json`
+`install` จะ copy template ทั้งหมด รวม `scripts/build-check.mjs` และเพิ่ม `build:check` หากยังไม่มี ส่วน `update` จะ backup `AGENTS.md` และ `CLAUDE.md` ก่อน update และจะไม่ทับ `ai-doc/preferences/` หรือ `ai-doc/project/`
 
-## Help และ version pinning
+หาก target folder ไม่มี `package.json` ให้ติดตั้งเฉพาะเอกสาร:
 
 ```bash
-npx --yes --allow-git=all github:raiz32/agent-template --help
+npx @raiz32/agent-template install ../my-folder --template-only
 ```
 
-เมื่อมี release tag ให้ pin version สำหรับใช้งานจริง:
+ดูคำสั่งทั้งหมด:
 
 ```bash
-npx --yes --allow-git=all github:raiz32/agent-template#v0.1.0 install ../my-project
+npx @raiz32/agent-template --help
 ```
+
+## Development
+
+```bash
+pnpm install
+pnpm build
+pnpm dev install ../my-project
+pnpm start --help
+```
+
+`dist/` เป็น generated output และ `prepack` จะเรียก build ก่อนสร้าง npm package เพื่อให้ CLI ที่ publish ตรงกับ source ล่าสุด
+
+## Publish
+
+package นี้ใช้ [MIT License](LICENSE)
+
+```bash
+npm login
+npm whoami
+pnpm build
+npm pack --dry-run
+npm publish --access public
+```
+
+ตรวจให้แน่ใจว่า npm account มีสิทธิ์ใช้ scope `@raiz32` ก่อน publish ครั้งแรก และเพิ่ม version ทุกครั้งก่อน publish release ถัดไป
