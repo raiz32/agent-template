@@ -18,6 +18,15 @@ export async function isDirectory(path: string): Promise<boolean> {
         return false;
     }
 }
+// ตรวจสอบ path เป็น file หรือไม่
+export async function isFile(path: string): Promise<boolean> {
+    try {
+        const pathStat = await stat(path);
+        return pathStat.isFile();
+    } catch (error) {
+        return false;
+    }
+}
 // สร้าง directory ถ้าไม่มี
 export async function ensureDirectory(path: string): Promise<void> {
     await mkdir(path, { recursive: true });

@@ -47,6 +47,21 @@ npx @raiz32/agent-template install ../my-folder --template-only
 
 `update` ใช้ได้กับ target ที่เคยติดตั้ง template แล้ว: หากมี `package.json` จะ update `scripts/build-check.mjs` และ `build:check`; หากไม่มี จะ update เฉพาะ instruction และ documentation
 
+## Doctor
+
+ตรวจสอบความพร้อมของ Agent Template ใน target project โดยไม่แก้ไขไฟล์ใด ๆ:
+
+```bash
+npx @raiz32/agent-template doctor .
+npx @raiz32/agent-template doctor ../my-project
+```
+
+`doctor` ตรวจ `AGENTS.md`, `CLAUDE.md` และ `ai-doc/` เสมอ หาก target มี `package.json` จะตรวจเพิ่มว่า `scripts/build-check.mjs` และ script `build:check` ถูกตั้งค่าเป็น `node scripts/build-check.mjs` หรือไม่
+
+- พบไฟล์หลักไม่ครบ: แสดง `FAIL` และคืน exit code `1`
+- Node.js integration ไม่ครบ: แสดง `WARN` แต่คืน exit code `0`
+- ตรวจครบ: แสดง `PASS` และคืน exit code `0`
+
 ดูคำสั่งทั้งหมด:
 
 ```bash

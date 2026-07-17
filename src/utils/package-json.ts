@@ -6,7 +6,7 @@ import {
     PACKAGE_JSON_FILE,
 } from './constants.js'
 
-interface PackageJson {
+export interface PackageJson {
     scripts?: Record<string, string>
     [key: string]: unknown
 }
@@ -32,4 +32,8 @@ export function addBuildCheckScript(packageJson: PackageJson): boolean {
 
     packageJson.scripts[BUILD_CHECK_SCRIPT_NAME] = BUILD_CHECK_SCRIPT_COMMAND;
     return true;
+}
+// อ่านค่า script จาก package.json โดยไม่แก้ไขข้อมูล
+export function getPackageScript(packageJson: PackageJson, scriptName: string): string | undefined {
+    return packageJson.scripts?.[scriptName];
 }

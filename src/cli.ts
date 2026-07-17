@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { installCommand } from "./commands/install.js";
 import { updateCommand } from "./commands/update.js";
+import { doctorCommand } from "./commands/doctor.js";
 import { logger } from "./utils/logger.js";
 
 function printHelp() {
@@ -11,16 +12,20 @@ function printHelp() {
           myagent install <target-path>
           myagent install <target-path> [--template-only]
           myagent update <target-path>
+          myagent doctor <target-path>
         
         Commands:
           install    Install Agent Framework into any target directory
           update     Update framework files in an installed target directory
+          doctor     Check whether an installed target is complete and configured
         
         Examples:
           pnpm tsx src/cli.ts install ../my-project
           pnpm tsx src/cli.ts update ../my-project
+          pnpm tsx src/cli.ts doctor ../my-project
           node dist/cli.js install ../my-project
           node dist/cli.js update ../my-project
+          node dist/cli.js doctor ../my-project
         `);
 }
 
@@ -33,7 +38,7 @@ async function main(): Promise<void> {
         return
     }
 
-    if (commandName !== 'install' && commandName !== 'update') {
+    if (commandName !== 'install' && commandName !== 'update' && commandName !== 'doctor') {
         throw new Error(`Unknown command: ${commandName}`);
     }
     if (!targetPath) {
@@ -48,7 +53,12 @@ async function main(): Promise<void> {
         return;
     }
 
-    await updateCommand({ targetPath });
+    if (commandName === 'update') {
+        await updateCommand({ targetPath });
+        return;
+    }
+
+    await doctorCommand({ targetPath });
 }
 
 main().catch((error: unknown) => {

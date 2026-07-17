@@ -14,6 +14,11 @@ export interface UpdateCommandOptions {
     // path project ปลายทาง
     targetPath: string;
 }
+// Option สำหรับ doctor command
+export interface DoctorCommandOptions {
+    // path project ที่ต้องการตรวจสอบ
+    targetPath: string;
+}
 export interface CopyItem {
     // path ต้นทาง
     sourcePath: string;
