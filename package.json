@@ -1,0 +1,26 @@
+{
+  "name": "agent-template",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "myagent": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "ai-doc",
+    "scripts"
+  ],
+  "scripts": {
+    "dev": "tsx src/cli.ts",
+    "build": "tsc",
+    "prepare": "npm run build",
+    "start": "node dist/cli.js"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.0",
+    "tsx": "^4.23.0",
+    "typescript": "^6.0.3"
+  }
+}

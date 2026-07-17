@@ -1,0 +1,15 @@
+node_modules
+dist
+.env
+.DS_Store
+.idea
+.vscode
+.history
+.codex
+.claude
+.agents
+.cursor
+PROJECT.md
+.superpowers
+docs
+todo.md
