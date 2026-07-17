@@ -15,16 +15,19 @@ import { getTemplateRoot } from '../utils/template-root.js';
 export async function installCommand(options: InstallCommandOptions): Promise<void> {
     const templateRootPath = getTemplateRoot()
     const targetRootPath = resolve(options.targetPath);
-    const templateItems = options.templateOnly ? TEMPLATE_ONLY_ITEMS : TEMPLATE_ITEMS;
+    await validateTargetDirectory(targetRootPath);
 
     logger.info(`Installing Agent Template to ${targetRootPath}`)
-    if (options.templateOnly) {
-        await validateTargetDirectory(targetRootPath);
-    } else {
-        await validateTargetProject(targetRootPath);
+    const packageJsonExists = await pathExists(join(targetRootPath, 'package.json'));
+    const templateOnly = options.templateOnly || !packageJsonExists;
+    const templateItems = templateOnly ? TEMPLATE_ONLY_ITEMS : TEMPLATE_ITEMS;
+
+    if (!packageJsonExists && !options.templateOnly) {
+        logger.warn('package.json not found; installed instructions and documentation only');
     }
+
     await copyTemplateFiles(templateRootPath, targetRootPath, templateItems);
-    if (!options.templateOnly) {
+    if (!templateOnly) {
         await setupPackageJson(targetRootPath);
     }
     logger.success('Agent Template installed successfully');
@@ -40,16 +43,6 @@ async function validateTargetDirectory(targetRootPath: string): Promise<void> {
     const targetIsDirectory = await isDirectory(targetRootPath);
     if (!targetIsDirectory) {
         throw new Error(`Target path is not a directory: ${targetRootPath}`)
-    }
-}
-
-// ตรวจสอบ target path เป็นโฟลเดอร์โปรเจคจริง
-async function validateTargetProject(targetRootPath: string): Promise<void> {
-    await validateTargetDirectory(targetRootPath);
-
-    const packageJsonExists = await pathExists(join(targetRootPath, 'package.json'));
-    if (!packageJsonExists) {
-        throw new Error(`package.json not found in target project: ${targetRootPath}`);
     }
 }
 

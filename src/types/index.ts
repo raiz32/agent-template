@@ -6,7 +6,7 @@ export type CopyItemType = "file" | "directory";
 export interface InstallCommandOptions {
     // path project ปลายทาง
     targetPath: string;
-    // copy เฉพาะ template ที่ไม่ต้องใช้ package.json
+    // บังคับ copy เฉพาะ instruction และ documentation
     templateOnly?: boolean;
 }
 // Option สำหรับ update command

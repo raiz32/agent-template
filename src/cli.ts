@@ -9,11 +9,11 @@ function printHelp() {
         
         Usage:
           myagent install <target-path>
-          myagent install <target-path> --template-only
+          myagent install <target-path> [--template-only]
           myagent update <target-path>
         
         Commands:
-          install    Install Agent Framework into target project
+          install    Install Agent Framework into any target directory
           update     Update framework files in target project
         
         Examples:
