@@ -45,7 +45,7 @@ npx @raiz32/agent-template update ../my-project
 npx @raiz32/agent-template install ../my-folder --template-only
 ```
 
-`update` ใช้กับ Node.js project ที่ติดตั้ง template แบบปกติแล้ว เพราะจะ update `scripts/build-check.mjs` และตรวจ `package.json`
+`update` ใช้ได้กับ target ที่เคยติดตั้ง template แล้ว: หากมี `package.json` จะ update `scripts/build-check.mjs` และ `build:check`; หากไม่มี จะ update เฉพาะ instruction และ documentation
 
 ดูคำสั่งทั้งหมด:
 

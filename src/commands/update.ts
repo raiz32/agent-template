@@ -6,6 +6,7 @@ import {
     AGENTS_MD_FILE,
     CLAUDE_MD_BACKUP_FILE,
     CLAUDE_MD_FILE,
+    TEMPLATE_ONLY_UPDATE_ITEMS,
     UPDATE_ITEMS,
 } from '../utils/constants.js';
 import { copyTemplateItem } from '../utils/copy.js';
@@ -24,16 +25,26 @@ export async function updateCommand(options: UpdateCommandOptions): Promise<void
     const targetRootPath = resolve(options.targetPath);
 
     logger.info(`Updating Agent Template in ${targetRootPath}`);
-    await validateTargetProject(targetRootPath);
+    await validateTargetDirectory(targetRootPath);
     await ensureInstalled(targetRootPath);
+
+    const packageJsonExists = await pathExists(join(targetRootPath, 'package.json'));
+    const updateItems = packageJsonExists ? UPDATE_ITEMS : TEMPLATE_ONLY_UPDATE_ITEMS;
+
+    if (!packageJsonExists) {
+        logger.warn('package.json not found; updated instructions and documentation only');
+    }
+
     await backupInstructionFiles(targetRootPath);
-    await copyUpdateFiles(templateRootPath, targetRootPath);
-    await setupPackageJson(targetRootPath);
+    await copyUpdateFiles(templateRootPath, targetRootPath, updateItems);
+    if (packageJsonExists) {
+        await setupPackageJson(targetRootPath);
+    }
     logger.success('Agent Template updated successfully');
 }
 
-// ตรวจสอบ target path เป็นโฟลเดอร์โปรเจคจริง
-async function validateTargetProject(targetRootPath: string): Promise<void> {
+// ตรวจสอบ target path เป็นโฟลเดอร์จริง
+async function validateTargetDirectory(targetRootPath: string): Promise<void> {
     const targetExists = await pathExists(targetRootPath);
     if (!targetExists) {
         throw new Error(`Target path does not exist: ${targetRootPath}`);
@@ -44,10 +55,6 @@ async function validateTargetProject(targetRootPath: string): Promise<void> {
         throw new Error(`Target path is not a directory: ${targetRootPath}`);
     }
 
-    const packageJsonExists = await pathExists(join(targetRootPath, 'package.json'));
-    if (!packageJsonExists) {
-        throw new Error(`package.json not found in target project: ${targetRootPath}`);
-    }
 }
 
 // ตรวจว่าเคย install แล้ว (มี AGENTS.md)
@@ -90,8 +97,12 @@ async function backupInstructionFiles(targetRootPath: string): Promise<void> {
 }
 
 // copy เฉพาะ UPDATE_ITEMS ไปยัง target
-async function copyUpdateFiles(templateRootPath: string, targetRootPath: string): Promise<void> {
-    for (const updateItem of UPDATE_ITEMS) {
+async function copyUpdateFiles(
+    templateRootPath: string,
+    targetRootPath: string,
+    updateItems: readonly CopyItem[],
+): Promise<void> {
+    for (const updateItem of updateItems) {
         const copyItem: CopyItem = {
             sourcePath: join(templateRootPath, updateItem.sourcePath),
             targetPath: join(targetRootPath, updateItem.targetPath),

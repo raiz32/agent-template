@@ -67,6 +67,24 @@ export const UPDATE_ITEMS: readonly CopyItem[] = [
         type: 'directory',
     },
 ] as const
+// รายชื่อไฟล์ที่ update สำหรับ folder ที่ไม่มี package.json
+export const TEMPLATE_ONLY_UPDATE_ITEMS: readonly CopyItem[] = [
+    {
+        sourcePath: 'AGENTS.md',
+        targetPath: 'AGENTS.md',
+        type: 'file',
+    },
+    {
+        sourcePath: 'CLAUDE.md',
+        targetPath: 'CLAUDE.md',
+        type: 'file',
+    },
+    {
+        sourcePath: 'ai-doc/handbook',
+        targetPath: 'ai-doc/handbook',
+        type: 'directory',
+    },
+] as const
 export const PACKAGE_JSON_FILE = 'package.json'
 export const AGENTS_MD_FILE = 'AGENTS.md'
 export const AGENTS_MD_BACKUP_FILE = 'AGENTS.md.bak'

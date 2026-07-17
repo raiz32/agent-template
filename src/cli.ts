@@ -14,7 +14,7 @@ function printHelp() {
         
         Commands:
           install    Install Agent Framework into any target directory
-          update     Update framework files in target project
+          update     Update framework files in an installed target directory
         
         Examples:
           pnpm tsx src/cli.ts install ../my-project
