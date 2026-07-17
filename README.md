@@ -32,7 +32,7 @@ npx --yes --allow-git=all github:raiz32/agent-template install ../my-project
 npx --yes --allow-git=all github:raiz32/agent-template update ../my-project
 ```
 
-`update` จะ backup `AGENTS.md` เป็น `AGENTS.md.bak` ก่อน update และไม่ทับ `ai-doc/preferences/` หรือ `ai-doc/project/`
+`update` จะ backup `AGENTS.md` เป็น `AGENTS.md.bak` และ `CLAUDE.md` เป็น `CLAUDE.md.bak` ก่อน update (หากมีไฟล์อยู่) และไม่ทับ `ai-doc/preferences/` หรือ `ai-doc/project/`
 
 ## ติดตั้งเฉพาะเอกสาร
 

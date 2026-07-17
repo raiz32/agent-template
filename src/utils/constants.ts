@@ -70,3 +70,5 @@ export const UPDATE_ITEMS: readonly CopyItem[] = [
 export const PACKAGE_JSON_FILE = 'package.json'
 export const AGENTS_MD_FILE = 'AGENTS.md'
 export const AGENTS_MD_BACKUP_FILE = 'AGENTS.md.bak'
+export const CLAUDE_MD_FILE = 'CLAUDE.md'
+export const CLAUDE_MD_BACKUP_FILE = 'CLAUDE.md.bak'
