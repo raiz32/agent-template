@@ -40,7 +40,8 @@
     "dev": "tsx src/cli.ts",
     "build": "tsc",
     "prepack": "npm run build",
-    "start": "node dist/cli.js"
+    "start": "node dist/cli.js",
+    "test": "tsx --test test/**/*.test.ts"
   },
   "devDependencies": {
     "@types/node": "^26.1.0",
