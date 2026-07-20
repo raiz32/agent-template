@@ -90,3 +90,12 @@ export const AGENTS_MD_FILE = 'AGENTS.md'
 export const AGENTS_MD_BACKUP_FILE = 'AGENTS.md.bak'
 export const CLAUDE_MD_FILE = 'CLAUDE.md'
 export const CLAUDE_MD_BACKUP_FILE = 'CLAUDE.md.bak'
+// โฟลเดอร์ skill กลางใน target project
+export const SKILLS_SOURCE_DIR = 'skills'
+// โฟลเดอร์ปลายทางของแต่ละ agent
+export const CLAUDE_COMMANDS_DIR = '.claude/commands'
+export const CODEX_PROMPTS_DIR = '.codex/prompts'
+export const CURSOR_COMMANDS_DIR = '.cursor/commands'
+// key ที่ Codex prompt frontmatter รองรับ (Cursor ไม่รองรับ frontmatter เลยจึงเป็น array ว่าง)
+export const CODEX_FRONTMATTER_ALLOWED_KEYS: readonly string[] = ['description', 'argument-hint']
+export const CURSOR_FRONTMATTER_ALLOWED_KEYS: readonly string[] = []
