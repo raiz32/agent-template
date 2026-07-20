@@ -68,6 +68,36 @@ npx @raiz32/agent-template doctor ../my-project
 npx @raiz32/agent-template --help
 ```
 
+## Skill
+
+แปลงไฟล์ skill กลางใน `skills/<name>.md` ของ target project ให้เป็น slash command สำหรับ Claude Code, Codex และ Cursor:
+
+```bash
+npx @raiz32/agent-template skill ../my-project
+npx @raiz32/agent-template skill ../my-project commit
+```
+
+ไม่ระบุชื่อ skill จะแปลงทุกไฟล์ `.md` ใน `skills/`; ระบุชื่อ (เช่น `commit` ที่มาจาก `skills/commit.md`) จะแปลงเฉพาะ skill นั้น หากระบุชื่อที่ไม่มีไฟล์อยู่จริง หรือ target ไม่มีโฟลเดอร์ `skills/` เลย คำสั่งจะแสดง error
+
+ไฟล์ต้นทางที่ `skills/<name>.md` เป็น flat YAML frontmatter (บรรทัดละ `key: value`, ไม่รองรับ nested) ตามด้วย markdown body เช่น
+
+```markdown
+---
+description: Commit staged changes with a conventional message
+argument-hint: [message]
+---
+
+# Commit
+
+...
+```
+
+`skill` จะเขียนไฟล์ปลายทางทั้ง 3 ที่เสมอ (เขียนทับไฟล์เดิมถ้ามีอยู่แล้ว) โดยกรอง frontmatter ต่างกันตามปลายทาง:
+
+- `.claude/commands/<name>.md` — เก็บ frontmatter ทุก key
+- `.codex/prompts/<name>.md` — เก็บเฉพาะ key `description` และ `argument-hint`
+- `.cursor/commands/<name>.md` — ตัด frontmatter ทิ้งทั้งหมด เหลือเฉพาะ markdown body
+
 ## Publish
 
 package นี้ใช้ [MIT License](LICENSE)
