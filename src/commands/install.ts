@@ -10,6 +10,7 @@ import {
     writePackageJson,
 } from '../utils/package-json.js';
 import { getTemplateRoot } from '../utils/template-root.js';
+import { skillCommand } from './skill.js';
 
 // ติดตั้ง agent framework ลง target path
 export async function installCommand(options: InstallCommandOptions): Promise<void> {
@@ -29,6 +30,9 @@ export async function installCommand(options: InstallCommandOptions): Promise<vo
     await copyTemplateFiles(templateRootPath, targetRootPath, templateItems);
     if (!templateOnly) {
         await setupPackageJson(targetRootPath);
+    }
+    if (options.skill) {
+        await skillCommand({ targetPath: targetRootPath });
     }
     logger.success('Agent Template installed successfully');
 }

@@ -12,18 +12,21 @@ function printHelp() {
         Usage:
           myagent install <target-path>
           myagent install <target-path> [--template-only]
+          myagent install <target-path> [--skill]
           myagent update <target-path>
           myagent doctor <target-path>
           myagent skill <target-path> [name]
 
         Commands:
           install    Install Agent Framework into any target directory
+                     --skill converts all skills/*.md into Claude Code, Codex, and Cursor slash commands right after install
           update     Update framework files in an installed target directory
           doctor     Check whether an installed target is complete and configured
           skill      Convert skills/<name>.md into Claude Code, Codex, and Cursor slash commands
 
         Examples:
           pnpm tsx src/cli.ts install ../my-project
+          pnpm tsx src/cli.ts install ../my-project --skill
           pnpm tsx src/cli.ts update ../my-project
           pnpm tsx src/cli.ts doctor ../my-project
           pnpm tsx src/cli.ts skill ../my-project
@@ -53,6 +56,7 @@ async function main(): Promise<void> {
         await installCommand({
             targetPath,
             templateOnly: commandOptions.includes('--template-only'),
+            skill: commandOptions.includes('--skill'),
         });
         return;
     }

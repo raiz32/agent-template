@@ -48,6 +48,12 @@ npx @raiz32/agent-template update ../my-project
 npx @raiz32/agent-template install ../my-folder --template-only
 ```
 
+ใช้ `--skill` เมื่อต้องการแปลง `skills/*.md` ทั้งหมดเป็น slash command ของ Claude Code, Codex และ Cursor ทันทีหลัง install (เทียบเท่ารัน `skill` ต่อจาก `install` ในคำสั่งเดียว ดู [Skill](#skill)):
+
+```bash
+npx @raiz32/agent-template install ../my-project --skill
+```
+
 `update` ใช้ได้กับ target ที่เคยติดตั้ง template แล้ว: หากมี `package.json` จะ update `scripts/build-check.mjs` และ `build:check`; หากไม่มี จะ update เฉพาะ instruction และ documentation
 
 ## Doctor

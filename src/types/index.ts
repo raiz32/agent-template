@@ -8,6 +8,8 @@ export interface InstallCommandOptions {
     targetPath: string;
     // บังคับ copy เฉพาะ instruction และ documentation
     templateOnly?: boolean;
+    // แปลง skill ทั้งหมดใน skills/ เป็น slash command ของแต่ละ agent ทันทีหลัง install
+    skill?: boolean;
 }
 // Option สำหรับ update command
 export interface UpdateCommandOptions {
