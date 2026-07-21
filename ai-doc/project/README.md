@@ -11,6 +11,28 @@
 - Build Tool: <!-- e.g. Vite -->
 - Testing: <!-- e.g. Playwright -->
 
+## Naming Convention
+
+<!-- Convention เฉพาะโปรเจกต์ที่ไม่ใช่มาตรฐาน JS/TS ทั่วไป -->
+<!-- ตัวอย่าง: -->
+<!-- - Composable: use* -->
+<!-- - Function: fn_* -->
+<!-- - Constant File: constants* -->
+
+## Folder Structure
+
+<!-- โครงสร้าง folder จริงของโปรเจกต์นี้ -->
+<!-- ตัวอย่าง: -->
+<!-- - Feature อยู่ใต้ src/views/<FeatureName>/ -->
+<!-- - Shared component อยู่ที่ src/components/ -->
+
+## Testing Convention
+
+<!-- Tool และรูปแบบ test locator ที่ใช้จริง -->
+<!-- ตัวอย่าง: -->
+<!-- - Playwright + data-testid -->
+<!-- - รูปแบบ: <feature>-<element>-<type> -->
+
 ## Key Services
 
 - API Base: <!-- e.g. src/services/api.ts -->

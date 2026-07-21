@@ -49,10 +49,8 @@
 ## Naming Convention
 
 - Variable: `camelCase`
-- Component: `PascalCase`
-- Composable: `use*`
-- Function: `fn_*`
-- Constant File: `constants*`
+- Component/Class: `PascalCase`
+- Convention อื่น (composable, function prefix, constant file) ดูที่ `ai-doc/project/README.md`
 
 ## Comment
 
@@ -62,54 +60,29 @@
 
 ## Testing
 
-- Interactive Component และ Element ที่ผู้ใช้มองเห็นหรือใช้ตรวจสอบผลลัพธ์ของ Test ควรมี `data-testid`
-- ใช้ `data-testid` เป็น Locator หลักสำหรับ Playwright หากสามารถเพิ่มได้
-- ใช้รูปแบบ `<feature>-<element>-<type>`
-- ตั้งชื่อจากหน้าที่ของ Element (Semantic) ไม่อ้างอิง CSS หรือ UI Library
+- หากโปรเจกต์มี UI: ทุก interactive element ที่ใช้ตรวจผลลัพธ์การทดสอบควรมี stable test locator ตาม convention ที่ระบุไว้ใน `ai-doc/project/README.md`
+- Tool และรูปแบบ locator (เช่น `data-testid`, รูปแบบ `<feature>-<element>-<type>`) ดูที่ `ai-doc/project/README.md`
 
 ---
 
 # 2. Folder & Module Structure
 
-- แต่ละ feature อยู่ใต้ `src/views/<FeatureName>/` และใช้โครงสร้างเดิมของ Feature ก่อนสร้าง Folder หรือ Pattern ใหม่
-- Component, Dialog, Composable, Constants และ Utils ที่ใช้เฉพาะ Feature ให้เก็บใน Feature นั้น
-- Logic ที่ใช้ร่วมหลาย Component ภายใน Feature ให้แยกไว้ใน `composables`
-- Utility ที่ใช้ซ้ำข้ามหลาย Feature ให้เก็บใน `src/utils`
-- `src/components/` ใช้สำหรับ Component ที่ใช้ร่วมหลาย Feature; `src/components/wrapper` ใช้สำหรับ Wrapper ที่ลงทะเบียนเป็น Global Component
+- จัดกลุ่มโค้ดตาม feature/domain: โค้ดที่ใช้เฉพาะ feature ให้อยู่กับ feature นั้น
+- โค้ดที่ใช้ร่วมหลาย feature ให้แยกไว้ใน shared layer (เช่น utils, shared composables/services)
+- โครงสร้าง folder จริงของโปรเจกต์นี้ ดูที่ `ai-doc/project/README.md`
 
 ---
 
-# 3. Patterns
-
-## UI
-<!-- ระบุ UI library หลักและกฎการใช้งาน -->
-<!-- ตัวอย่าง: ใช้ PrimeVue component ก่อนสร้างใหม่ -->
-
-## Notifications & Confirmation
-<!-- toast, confirm dialog, error handler -->
-<!-- ตัวอย่าง: Success → useToast(), Error → useError().fn_handleError(error, { summary }) -->
-
-## Dialog & Component Communication
-<!-- defineModel, emit conventions -->
-<!-- ตัวอย่าง: Dialog visibility ใช้ defineModel<boolean>('visible') -->
-
-## API
-<!-- base URL, error handler, payload encoding ถ้ามี -->
-<!-- ตัวอย่าง: ทุก API ผ่าน src/services/api.ts -->
-
----
-
-# 4. Command Safety
+# 3. Command Safety
 
 - แก้ไขเฉพาะ Scope งาน หลีกเลี่ยงการ Refactor ที่ไม่เกี่ยวข้อง
 - หากจำเป็นต้องเปลี่ยน Architecture, Pattern หรือ Business Logic ให้ขอคำยืนยันก่อน
-- ห้าม run script ใน `package.json` เอง ยกเว้น `build:check`
-- ห้าม run `playwright`, `test`, `build`, `preview`, `deploy`, `install` เอง — ให้เสนอคำสั่งให้ผู้ใช้รันเท่านั้น
+- ห้าม run script ใน `package.json` เองให้เสนอคำสั่งให้ผู้ใช้รันเท่านั้น ยกเว้น `build:check`
 - ตรวจ build ด้วย `build:check` เท่านั้น:
   - `BUILD PASS` = ผ่าน ไม่ต้องอ่านไฟล์เพิ่ม
   - `BUILD FAIL` = อ่าน `build-error.txt` เฉพาะตอน fail
 
-# 5. Project References
+# 4. Project References
 
 | Document | Description |
 |----------|-------------|
@@ -119,4 +92,4 @@
 | [ai-doc/preferences/debug.md](ai-doc/preferences/debug.md) | Checklist และ workflow สำหรับ debug |
 | [ai-doc/preferences/testing.md](ai-doc/preferences/testing.md) | Playwright testing strategy |
 | [ai-doc/handbook/README.md](ai-doc/handbook/README.md) | Technical knowledge verified from this project's source code |
-| [ai-doc/project/README.md](ai-doc/project/README.md) | Tech stack และ context เฉพาะโปรเจกต์นี้ |
+| [ai-doc/project/README.md](ai-doc/project/README.md) | Tech stack, naming/folder/testing convention, patterns index เฉพาะโปรเจกต์นี้ |
