@@ -16,7 +16,10 @@ flowchart TD
   C --> D{Enough info to write the Plan?}
   D -- No --> C
   D -- Yes --> E[Write ai-doc/plans/topic-slug.md immediately]
-  E --> F[Summarize for the user with the file path]
+  E --> F[Confirm path to user]
+  F --> G{Continue to Todo List?}
+  G -- Yes --> H[Invoke todo-list skill]
+  G -- No --> I[Done]
 ```
 
 ### 1. Explore context first, always
@@ -40,6 +43,8 @@ There is no fixed question count. Stop asking once these topics are covered.
 Once the topics above are covered, write the Plan document — no separate draft/approval round-trip.
 
 **Path:** `ai-doc/plans/<topic-slug>.md`, where `<topic-slug>` is lowercase-hyphenated, derived from `$ARGUMENTS` if given, otherwise from the stated goal.
+
+**Content language:** write the prose content (Requirement Summary, Approach, Related Files rationale, Open Questions) in whatever language the user used in the conversation. Keep the template's structural headings and markdown syntax exactly as written below, regardless of conversation language.
 
 **Template:**
 
@@ -71,3 +76,7 @@ flowchart TD
 ### 4. Confirm
 
 After writing the file, tell the user the file path and a one-sentence summary of what it covers.
+
+### 5. Offer to continue to Todo List
+
+Ask the user whether to break the plan down into a Todo List now (multiple choice: yes / not yet). If yes, invoke the `todo-list` skill in this same session, passing the path just written — the plan content is already in context, so don't re-read the file.
