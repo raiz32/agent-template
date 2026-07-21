@@ -6,6 +6,7 @@ CLI สำหรับติดตั้งชุดเอกสารและ 
 
 - `AGENTS.md` และ `CLAUDE.md`
 - `ai-doc/` สำหรับให้ AI เข้าใจรูปแบบการทำงานและบริบทของ project
+- `skills/` ชุด skill กลางที่มากับ template (copy เฉพาะตอน `install`, ไม่ sync ตอน `update` เพื่อไม่ทับ skill ที่ target แก้ไขเอง) — ดู [Skill](#skill)
 
 หาก target มี `package.json` จะได้รับเพิ่ม:
 
@@ -27,6 +28,8 @@ npx @raiz32/agent-template install .
 ```bash
 pnpm dlx @raiz32/agent-template install .
 ```
+
+
 
 ## Usage
 
@@ -68,35 +71,44 @@ npx @raiz32/agent-template doctor ../my-project
 npx @raiz32/agent-template --help
 ```
 
+
+
 ## Skill
 
-แปลงไฟล์ skill กลางใน `skills/<name>.md` ของ target project ให้เป็น slash command สำหรับ Claude Code, Codex และ Cursor:
+เขียน skill กลางไว้ที่เดียว แล้วแปลงให้ **Claude Code**, **Codex** และ **Cursor** ใช้งานได้พร้อมกัน โดยแต่ละ agent เรียกใช้ต่างกันตามกลไกของตัวเอง (ดูตารางด้านล่าง)
 
-```bash
-npx @raiz32/agent-template skill ../my-project
-npx @raiz32/agent-template skill ../my-project commit
-```
+### Quick start
 
-ไม่ระบุชื่อ skill จะแปลงทุกไฟล์ `.md` ใน `skills/`; ระบุชื่อ (เช่น `commit` ที่มาจาก `skills/commit.md`) จะแปลงเฉพาะ skill นั้น หากระบุชื่อที่ไม่มีไฟล์อยู่จริง หรือ target ไม่มีโฟลเดอร์ `skills/` เลย คำสั่งจะแสดง error
+1. สร้างไฟล์ต้นทางที่ `<target>/skills/<name>.md` เป็น flat YAML frontmatter (บรรทัดละ `key: value`, ไม่รองรับ nested) ตามด้วย markdown body:
+  ```markdown
+    ---
+    description: Commit staged changes with a conventional message
+    argument-hint: [message]
+    ---
 
-ไฟล์ต้นทางที่ `skills/<name>.md` เป็น flat YAML frontmatter (บรรทัดละ `key: value`, ไม่รองรับ nested) ตามด้วย markdown body เช่น
+    # Commit
 
-```markdown
----
-description: Commit staged changes with a conventional message
-argument-hint: [message]
----
+    ...
+  ```
+2. รันคำสั่งแปลง:
+  ```bash
+    npx @raiz32/agent-template skill ../my-project           # แปลงทุกไฟล์ .md ใน skills/
+    npx @raiz32/agent-template skill ../my-project commit     # แปลงเฉพาะ skills/commit.md
+  ```
+    ระบุชื่อที่ไม่มีไฟล์อยู่จริง คำสั่งจะแสดง error พร้อมรายชื่อ skill ที่มีอยู่จริงให้เลือก
+3. ถ้า target ยังไม่มีโฟลเดอร์ `skills/` เลย คำสั่งจะ copy ชุด `skills/` กลางที่มากับ template นี้ไปติดตั้งให้ก่อนอัตโนมัติ (เทียบเท่ากับที่ `install`/`update` ทำอยู่แล้ว — ใช้กรณี target ติดตั้งไว้ก่อนที่ `skills/` จะถูกเพิ่มเข้ามา หรือ `skills/` ถูกลบไปเอง) แล้วค่อยแปลงต่อให้เลย ไม่ต้องสร้างโฟลเดอร์เอง
 
-# Commit
+`skill` เขียนทับไฟล์ปลายทางเดิมเสมอ ปลอดภัยที่จะรันซ้ำได้ทุกครั้งที่แก้ไขไฟล์ต้นทาง
 
-...
-```
+### ปลายทางแต่ละ agent
 
-`skill` จะเขียนไฟล์ปลายทางทั้ง 3 ที่เสมอ (เขียนทับไฟล์เดิมถ้ามีอยู่แล้ว) โดยกรอง frontmatter ต่างกันตามปลายทาง:
 
-- `.claude/commands/<name>.md` — เก็บ frontmatter ทุก key
-- `.codex/prompts/<name>.md` — เก็บเฉพาะ key `description` และ `argument-hint`
-- `.cursor/commands/<name>.md` — ตัด frontmatter ทิ้งทั้งหมด เหลือเฉพาะ markdown body
+| Agent       | ไฟล์ปลายทาง                               | Frontmatter ที่เก็บ                                | วิธีเรียกใช้                                                                |
+| ----------- | ----------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------- |
+| Claude Code | `<target>/.claude/commands/<name>.md`     | ทุก key จากต้นทาง                                  | พิมพ์ `/<name>` เอง (slash command)                                         |
+| Codex       | `<target>/.codex/skills/<name>/SKILL.md`  | `description` + `name: <name>` (เพิ่มให้อัตโนมัติ) | Codex เรียกใช้เองอัตโนมัติตามความเกี่ยวข้อง — ไม่มี slash command ให้พิมพ์  |
+| Cursor      | `<target>/.cursor/skills/<name>/SKILL.md` | `description` + `name: <name>` (เพิ่มให้อัตโนมัติ) | Cursor เรียกใช้เองอัตโนมัติตามความเกี่ยวข้อง — ไม่มี slash command ให้พิมพ์ |
+
 
 ## Publish
 

@@ -33,7 +33,12 @@ export function parseFrontmatter(raw: string): ParsedSkillFile {
 
 // ประกอบ frontmatter block กลับเป็น markdown string โดยกรองเฉพาะ key ที่อนุญาต
 // allowedKeys undefined = เก็บทุก key, [] = ตัด frontmatter ทิ้งทั้งหมด (เช่น Cursor)
-export function buildSkillFile(parsed: ParsedSkillFile, allowedKeys?: readonly string[]): string {
+// extraLines = key:value ที่ปลายทางต้องการเพิ่มเอง (เช่น `name:` ของ Codex Agent Skills ที่ไม่มีในไฟล์ต้นทาง) แทรกไว้ก่อน filteredLines เสมอ
+export function buildSkillFile(
+    parsed: ParsedSkillFile,
+    allowedKeys?: readonly string[],
+    extraLines?: readonly string[],
+): string {
     const filteredLines = allowedKeys
         ? parsed.frontmatterLines.filter((line) => {
               const key = line.split(':')[0]?.trim();
@@ -41,9 +46,11 @@ export function buildSkillFile(parsed: ParsedSkillFile, allowedKeys?: readonly s
           })
         : parsed.frontmatterLines;
 
-    if (filteredLines.length === 0) {
+    const combinedLines = [...(extraLines ?? []), ...filteredLines];
+
+    if (combinedLines.length === 0) {
         return `${parsed.body}\n`;
     }
 
-    return `${FRONTMATTER_DELIMITER}\n${filteredLines.join('\n')}\n${FRONTMATTER_DELIMITER}\n\n${parsed.body}\n`;
+    return `${FRONTMATTER_DELIMITER}\n${combinedLines.join('\n')}\n${FRONTMATTER_DELIMITER}\n\n${parsed.body}\n`;
 }

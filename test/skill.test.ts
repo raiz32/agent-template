@@ -32,13 +32,17 @@ test('skillCommand installs a single named skill to all three agent destinations
         await skillCommand({ targetPath, name: 'commit' });
 
         const claudeOutput = await readFile(join(targetPath, '.claude/commands/commit.md'), 'utf-8');
-        const codexOutput = await readFile(join(targetPath, '.codex/prompts/commit.md'), 'utf-8');
-        const cursorOutput = await readFile(join(targetPath, '.cursor/commands/commit.md'), 'utf-8');
+        const codexOutput = await readFile(join(targetPath, '.codex/skills/commit/SKILL.md'), 'utf-8');
+        const cursorOutput = await readFile(join(targetPath, '.cursor/skills/commit/SKILL.md'), 'utf-8');
 
         assert.match(claudeOutput, /allowed-tools: Bash\(git add:\*\)/);
+        assert.match(codexOutput, /name: commit/);
+        assert.match(codexOutput, /description: Prep a branch/);
         assert.doesNotMatch(codexOutput, /allowed-tools/);
-        assert.match(codexOutput, /argument-hint: \[message\]/);
-        assert.doesNotMatch(cursorOutput, /---/);
+        assert.doesNotMatch(codexOutput, /argument-hint/);
+        assert.match(cursorOutput, /name: commit/);
+        assert.match(cursorOutput, /description: Prep a branch/);
+        assert.doesNotMatch(cursorOutput, /allowed-tools/);
         assert.match(cursorOutput, /Create a git commit with message: \$ARGUMENTS/);
     } finally {
         await rm(targetPath, { recursive: true, force: true });
@@ -55,9 +59,13 @@ test('skillCommand installs every skill when name is omitted', async () => {
 
         const claudeCommit = await readFile(join(targetPath, '.claude/commands/commit.md'), 'utf-8');
         const claudeReview = await readFile(join(targetPath, '.claude/commands/review.md'), 'utf-8');
+        const codexCommit = await readFile(join(targetPath, '.codex/skills/commit/SKILL.md'), 'utf-8');
+        const codexReview = await readFile(join(targetPath, '.codex/skills/review/SKILL.md'), 'utf-8');
 
         assert.ok(claudeCommit.length > 0);
         assert.ok(claudeReview.length > 0);
+        assert.match(codexCommit, /name: commit/);
+        assert.match(codexReview, /name: review/);
     } finally {
         await rm(targetPath, { recursive: true, force: true });
     }
@@ -80,13 +88,14 @@ test('skillCommand overwrites an existing destination file', async () => {
     }
 });
 
-test('skillCommand throws when the skills directory does not exist', async () => {
+test('skillCommand copies the template skills/ into target when target has none, then installs it', async () => {
     const targetPath = await createTempTarget();
     try {
-        await assert.rejects(
-            () => skillCommand({ targetPath }),
-            /skills directory not found/,
-        );
+        await skillCommand({ targetPath, name: 'interview-plan' });
+
+        const claudeOutput = await readFile(join(targetPath, '.claude/commands/interview-plan.md'), 'utf-8');
+        assert.ok(claudeOutput.length > 0);
+        assert.ok(await readFile(join(targetPath, 'skills/interview-plan.md'), 'utf-8'));
     } finally {
         await rm(targetPath, { recursive: true, force: true });
     }

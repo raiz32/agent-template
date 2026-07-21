@@ -2,16 +2,18 @@ import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import type { SkillCommandOptions } from '../types/index.js';
 import {
+    AGENT_SKILL_FILE_NAME,
+    AGENT_SKILL_FRONTMATTER_ALLOWED_KEYS,
     CLAUDE_COMMANDS_DIR,
-    CODEX_FRONTMATTER_ALLOWED_KEYS,
-    CODEX_PROMPTS_DIR,
-    CURSOR_COMMANDS_DIR,
-    CURSOR_FRONTMATTER_ALLOWED_KEYS,
+    CODEX_SKILLS_DIR,
+    CURSOR_SKILLS_DIR,
     SKILLS_SOURCE_DIR,
 } from '../utils/constants.js';
+import { copyTemplateItem } from '../utils/copy.js';
 import { buildSkillFile, parseFrontmatter } from '../utils/frontmatter.js';
 import { ensureDirectory, isDirectory, pathExists } from '../utils/fs.js';
 import { logger } from '../utils/logger.js';
+import { getTemplateRoot } from '../utils/template-root.js';
 
 const SKILL_FILE_EXTENSION = '.md';
 
@@ -19,13 +21,35 @@ interface SkillDestination {
     label: string;
     directory: string;
     allowedKeys?: readonly string[];
+    // ชื่อไฟล์ปลายทางเทียบกับ directory; ค่าเริ่มต้นคือ `<skillName>.md` (Claude Code)
+    // Codex/Cursor Agent Skills ต้องเป็น `<skillName>/SKILL.md` ตาม spec (ชื่อโฟลเดอร์ต้องตรงกับ frontmatter `name`)
+    resolveFileName?: (skillName: string) => string;
+    // key:value เพิ่มเติมที่ปลายทางต้องใส่เอง เพราะไม่มีในไฟล์ต้นทาง (เช่น `name:` ของ Agent Skills)
+    resolveExtraFrontmatterLines?: (skillName: string) => readonly string[];
 }
 
-// ปลายทางทั้ง 3 agent ต่อ 1 skill; allowedKeys undefined = เก็บ frontmatter ทุก key (Claude Code)
+// ปลายทางทั้ง 3 agent ต่อ 1 skill เขียนไว้ใน target project เสมอ (project-level ทั้งหมด)
+// Codex และ Cursor ใช้ Agent Skills open standard เดียวกัน (name+description, auto-invoked)
+// allowedKeys undefined = เก็บ frontmatter ทุก key (Claude Code)
+const AGENT_SKILL_RESOLVE_FILE_NAME = (skillName: string): string => join(skillName, AGENT_SKILL_FILE_NAME);
+const AGENT_SKILL_RESOLVE_EXTRA_FRONTMATTER_LINES = (skillName: string): readonly string[] => [`name: ${skillName}`];
+
 const SKILL_DESTINATIONS: readonly SkillDestination[] = [
     { label: 'Claude Code', directory: CLAUDE_COMMANDS_DIR },
-    { label: 'Codex', directory: CODEX_PROMPTS_DIR, allowedKeys: CODEX_FRONTMATTER_ALLOWED_KEYS },
-    { label: 'Cursor', directory: CURSOR_COMMANDS_DIR, allowedKeys: CURSOR_FRONTMATTER_ALLOWED_KEYS },
+    {
+        label: 'Codex',
+        directory: CODEX_SKILLS_DIR,
+        allowedKeys: AGENT_SKILL_FRONTMATTER_ALLOWED_KEYS,
+        resolveFileName: AGENT_SKILL_RESOLVE_FILE_NAME,
+        resolveExtraFrontmatterLines: AGENT_SKILL_RESOLVE_EXTRA_FRONTMATTER_LINES,
+    },
+    {
+        label: 'Cursor',
+        directory: CURSOR_SKILLS_DIR,
+        allowedKeys: AGENT_SKILL_FRONTMATTER_ALLOWED_KEYS,
+        resolveFileName: AGENT_SKILL_RESOLVE_FILE_NAME,
+        resolveExtraFrontmatterLines: AGENT_SKILL_RESOLVE_EXTRA_FRONTMATTER_LINES,
+    },
 ];
 
 // แปลง skill กลางใน <target>/skills เป็น slash command ของ Claude Code, Codex, Cursor
@@ -34,7 +58,7 @@ export async function skillCommand(options: SkillCommandOptions): Promise<void> 
     await validateTargetDirectory(targetRootPath);
 
     const skillsSourcePath = join(targetRootPath, SKILLS_SOURCE_DIR);
-    await validateSkillsDirectory(skillsSourcePath);
+    await ensureSkillsDirectory(skillsSourcePath);
 
     const skillNames = options.name
         ? [await resolveSingleSkill(skillsSourcePath, options.name)]
@@ -60,12 +84,21 @@ async function validateTargetDirectory(targetRootPath: string): Promise<void> {
     }
 }
 
-// ตรวจสอบว่ามี skills/ อยู่จริงใน target
-async function validateSkillsDirectory(skillsSourcePath: string): Promise<void> {
+// ตรวจสอบว่ามี skills/ อยู่จริงใน target ถ้ายังไม่มีให้ copy ชุด skills/ กลางจาก template นี้ไปติดตั้งให้ก่อน
+async function ensureSkillsDirectory(skillsSourcePath: string): Promise<void> {
     const skillsDirectoryExists = await isDirectory(skillsSourcePath);
-    if (!skillsDirectoryExists) {
+    if (skillsDirectoryExists) {
+        return;
+    }
+
+    const templateSkillsPath = join(getTemplateRoot(), SKILLS_SOURCE_DIR);
+    const templateSkillsExists = await isDirectory(templateSkillsPath);
+    if (!templateSkillsExists) {
         throw new Error(`skills directory not found: ${skillsSourcePath}`);
     }
+
+    await copyTemplateItem({ sourcePath: templateSkillsPath, targetPath: skillsSourcePath, type: 'directory' });
+    logger.success(`Copied skills/ template to ${skillsSourcePath}`);
 }
 
 // resolve ชื่อ skill เดียว พร้อม error ที่แสดงรายชื่อ skill ที่มีจริงถ้าไม่พบ
@@ -104,12 +137,17 @@ async function installSkill(
     const parsedSkillFile = parseFrontmatter(rawSkillFile);
 
     for (const destination of SKILL_DESTINATIONS) {
-        const destinationDirectory = join(targetRootPath, destination.directory);
-        const destinationFileName = `${skillName}${SKILL_FILE_EXTENSION}`;
-        const destinationFilePath = join(destinationDirectory, destinationFileName);
+        const destinationFileName = destination.resolveFileName
+            ? destination.resolveFileName(skillName)
+            : `${skillName}${SKILL_FILE_EXTENSION}`;
+        const destinationFilePath = join(targetRootPath, destination.directory, destinationFileName);
+        const extraFrontmatterLines = destination.resolveExtraFrontmatterLines?.(skillName);
 
-        await ensureDirectory(destinationDirectory);
-        await writeFile(destinationFilePath, buildSkillFile(parsedSkillFile, destination.allowedKeys));
+        await ensureDirectory(join(destinationFilePath, '..'));
+        await writeFile(
+            destinationFilePath,
+            buildSkillFile(parsedSkillFile, destination.allowedKeys, extraFrontmatterLines),
+        );
         logger.success(`${destination.label}: ${join(destination.directory, destinationFileName)}`);
     }
 }

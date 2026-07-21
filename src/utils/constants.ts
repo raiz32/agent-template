@@ -25,6 +25,11 @@ export const TEMPLATE_ITEMS: readonly CopyItem[] = [
         targetPath: 'scripts/build-check.mjs',
         type: 'file',
     },
+    {
+        sourcePath: 'skills',
+        targetPath: 'skills',
+        type: 'directory',
+    },
 ] as const
 // รายชื่อไฟล์ template สำหรับ folder ที่ไม่ใช่ Node.js project
 export const TEMPLATE_ONLY_ITEMS: readonly CopyItem[] = [
@@ -41,6 +46,11 @@ export const TEMPLATE_ONLY_ITEMS: readonly CopyItem[] = [
     {
         sourcePath: 'ai-doc',
         targetPath: 'ai-doc',
+        type: 'directory',
+    },
+    {
+        sourcePath: 'skills',
+        targetPath: 'skills',
         type: 'directory',
     },
 ] as const
@@ -92,10 +102,13 @@ export const CLAUDE_MD_FILE = 'CLAUDE.md'
 export const CLAUDE_MD_BACKUP_FILE = 'CLAUDE.md.bak'
 // โฟลเดอร์ skill กลางใน target project
 export const SKILLS_SOURCE_DIR = 'skills'
+// ชื่อไฟล์ตาม Agent Skills open standard (Codex, Cursor): <target>/.<agent>/skills/<name>/SKILL.md
+export const AGENT_SKILL_FILE_NAME = 'SKILL.md'
 // โฟลเดอร์ปลายทางของแต่ละ agent
 export const CLAUDE_COMMANDS_DIR = '.claude/commands'
-export const CODEX_PROMPTS_DIR = '.codex/prompts'
-export const CURSOR_COMMANDS_DIR = '.cursor/commands'
-// key ที่ Codex prompt frontmatter รองรับ (Cursor ไม่รองรับ frontmatter เลยจึงเป็น array ว่าง)
-export const CODEX_FRONTMATTER_ALLOWED_KEYS: readonly string[] = ['description', 'argument-hint']
-export const CURSOR_FRONTMATTER_ALLOWED_KEYS: readonly string[] = []
+// Codex Agent Skills (project-level, auto-invoked): <target>/.codex/skills/<name>/SKILL.md
+export const CODEX_SKILLS_DIR = '.codex/skills'
+// Cursor Agent Skills (project-level, auto-invoked): <target>/.cursor/skills/<name>/SKILL.md
+export const CURSOR_SKILLS_DIR = '.cursor/skills'
+// key ที่ SKILL.md frontmatter รองรับตาม Agent Skills spec: name (inject จาก skill name) + description
+export const AGENT_SKILL_FRONTMATTER_ALLOWED_KEYS: readonly string[] = ['description']
