@@ -20,6 +20,9 @@ flowchart TD
   D -- Yes --> F[Break the plan into dependency-ordered tasks]
   F --> G[Write ai-doc/todos/topic-slug.md]
   G --> H[Confirm path and task count to the user]
+  H --> I{Continue to Execute?}
+  I -- Yes --> J[Invoke execute skill]
+  I -- No --> K[Done]
 ```
 
 ### 1. Determine the plan source
@@ -82,3 +85,7 @@ Once tasks are broken down, write the Todo List document — no separate draft/a
 ### 6. Confirm
 
 After writing the file, tell the user the file path and how many top-level tasks it contains.
+
+### 7. Offer to continue to Execute
+
+After confirming the file path and task count, ask the user whether to start executing now (multiple choice: yes / not yet). If yes, invoke the `execute` skill in this same session, passing the path just written — the todo content is already in context, so don't re-read the file.
